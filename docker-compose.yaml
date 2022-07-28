@@ -1,0 +1,36 @@
+version: "3"
+
+networks:
+  mynetwork:
+    ipam:
+      driver: default
+      config:
+        - subnet: 182.17.0.0/16
+          gateway: 182.17.0.1
+
+services:
+  mysql:
+    container_name: mysql-svr
+    image: mysql/mysql-server:8.0
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_HOST: "182.17.%.%"
+    networks:
+      - mynetwork
+  redis:
+    container_name: redis-svr
+    image: redis:5.0
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - mynetwork
